@@ -164,7 +164,7 @@ const InstitutionDashboard = () => {
                 <input 
                   type="text" 
                   placeholder="Escribe el nombre de la institución..."
-                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border border-slate-100 rounded-[28px] focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400 outline-none transition-all font-bold text-slate-700 shadow-sm"
+                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border border-slate-100 rounded-[28px] focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400 outline-none transition-all font-bold text-slate-700 text-base shadow-sm"
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                 />

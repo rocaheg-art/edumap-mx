@@ -620,8 +620,8 @@ const Home: React.FC = () => {
             <div className="flex items-center p-1 bg-white rounded-2xl border border-slate-100 shadow-sm gap-1 shrink-0">
                 {[
                     { id: '', label: 'Todas' },
-                    { id: '1', label: 'Públicas' },
-                    { id: '2', label: 'Privadas' },
+                    { id: '2', label: 'Públicas' },
+                    { id: '1', label: 'Privadas' },
                 ].map((s) => (
                     <button
                         key={s.id}

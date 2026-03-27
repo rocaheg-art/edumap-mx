@@ -179,13 +179,13 @@ const OfertaEducativa: React.FC = () => {
   return (
     <div className="min-h-screen pb-40 relative px-4 md:px-0">
       {/* Mobile Sticky Search Bar */}
-      <div className="lg:hidden sticky top-0 z-[50] bg-white/90 backdrop-blur-2xl border-b border-slate-100 -mx-4 px-4 py-4 space-y-3 shadow-sm">
+      <div className="md:hidden sticky top-0 z-[50] bg-white/90 backdrop-blur-2xl border-b border-slate-100 -mx-4 px-4 py-4 space-y-3 shadow-sm">
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
             placeholder="Buscar carrera o universidad..."
-            className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 text-xs shadow-inner focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 text-base shadow-inner focus:ring-2 focus:ring-indigo-500/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -213,14 +213,15 @@ const OfertaEducativa: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        <aside className="hidden lg:block w-72 shrink-0">
+      <div className="flex flex-col md:flex-row gap-8">
+        <aside className="hidden md:block w-72 shrink-0">
           <div className="bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar">
             <div className="flex items-center gap-2 mb-6">
               <div className="p-1.5 bg-indigo-600 text-white rounded-lg"><Filter size={16} /></div>
               <h2 className="text-lg font-black text-slate-900 tracking-tight">Filtros</h2>
             </div>
             <div className="space-y-6">
+              {/* Search */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Carrera / Institución</label>
                 <div className="relative group">
@@ -228,13 +229,39 @@ const OfertaEducativa: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Ej. Medicina..."
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 text-xs"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold text-slate-700 text-base"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
               </div>
+
+              {/* Basic Filters */}
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Nivel Educativo</label>
+                  <select 
+                    value={filters.nivel}
+                    onChange={e => setFilters({...filters, nivel: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none font-bold text-xs text-slate-700"
+                  >
+                    <option value="">Todos los niveles</option>
+                    {catalogos.niveles.map(n => <option key={n.id_nivel} value={n.id_nivel}>{n.nombre}</option>)}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Modalidad</label>
+                  <select 
+                    value={filters.modalidad}
+                    onChange={e => setFilters({...filters, modalidad: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none font-bold text-xs text-slate-700"
+                  >
+                    <option value="">Todas las modalidades</option>
+                    {catalogos.modalidades.map(m => <option key={m.id_modalidad} value={m.id_modalidad}>{m.nombre}</option>)}
+                  </select>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Estado</label>
                   <select 
@@ -246,6 +273,91 @@ const OfertaEducativa: React.FC = () => {
                     {catalogos.estados.map(e => <option key={e.id_entidad} value={e.id_entidad}>{e.nombre}</option>)}
                   </select>
                 </div>
+
+                {filters.estado && (
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Municipio</label>
+                    <select 
+                      value={filters.municipio}
+                      onChange={e => setFilters({...filters, municipio: e.target.value})}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none font-bold text-xs text-slate-700"
+                    >
+                      <option value="">Todos los municipios</option>
+                      {catalogos.municipios.filter(m => m.id_entidad === Number(filters.estado)).map(m => (
+                        <option key={m.id_municipio} value={m.id_municipio}>{m.nombre}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Sostenimiento</label>
+                  <select 
+                    value={filters.sostenimiento}
+                    onChange={e => setFilters({...filters, sostenimiento: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none font-bold text-xs text-slate-700"
+                  >
+                    <option value="">Cualquier sector</option>
+                    <option value="2">Público</option>
+                    <option value="1">Privado / Particular</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Área de Estudios</label>
+                  <select 
+                    value={filters.id_campo_detallado}
+                    onChange={e => setFilters({...filters, id_campo_detallado: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none font-bold text-xs text-slate-700"
+                  >
+                    <option value="">Todas las áreas</option>
+                    {catalogos.campos.map(c => <option key={c.id_campo_detallado} value={c.id_campo_detallado}>{c.nombre}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Advanced Section */}
+              <div className="pt-4 border-t border-slate-100">
+                <button 
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="w-full flex items-center justify-between py-2 text-slate-600 hover:text-indigo-600 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Settings2 size={16} />
+                    <span className="text-xs font-black uppercase tracking-widest">Avanzados</span>
+                  </div>
+                  {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+
+                <AnimatePresence>
+                  {showAdvanced && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden space-y-4 pt-4"
+                    >
+                      {[
+                        { label: 'Eficiencia Mínima (%)', id: 'min_eficiencia', icon: '⚡' },
+                        { label: 'Tasa Egreso Mínima (%)', id: 'min_tasa_egreso', icon: '🎓' },
+                        { label: '% Mujeres Mínimo', id: 'min_mujeres', icon: '👩‍🎓' },
+                        { label: 'Inclusión Mínima (%)', id: 'min_inclusion', icon: '🤝' },
+                      ].map(adv => (
+                        <div key={adv.id} className="space-y-2">
+                          <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">{adv.label}</label>
+                          <input 
+                            type="number"
+                            min="0" max="100"
+                            placeholder="0"
+                            value={filters[adv.id]}
+                            onChange={e => setFilters({...filters, [adv.id]: e.target.value})}
+                            className="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg outline-none font-bold text-xs"
+                          />
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -277,7 +389,7 @@ const OfertaEducativa: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 mb-8 pb-4 lg:pb-0 scroll-smooth snap-x no-scrollbar">
+          <div className="flex overflow-x-auto md:grid md:grid-cols-4 gap-4 mb-8 pb-4 md:pb-0 scroll-smooth snap-x no-scrollbar">
             {[
               { label: 'Total Ofertas', val: totalRecords, bg: 'bg-indigo-50', color: 'text-indigo-600' },
               { label: 'Nivel Global', val: filters.nivel ? catalogos.niveles.find(n => filters.nivel.split(',').includes(n.id_nivel.toString()))?.nombre.split(' ')[0] : 'Todos', bg: 'bg-emerald-50', color: 'text-emerald-600' },
@@ -331,11 +443,11 @@ const OfertaEducativa: React.FC = () => {
       </AnimatePresence>
 
       {/* Mobile Bottom Filter Bar */}
-      <div className="lg:hidden fixed bottom-28 left-0 right-0 z-[1000] px-4 pointer-events-none">
+      <div className="md:hidden fixed bottom-28 left-0 right-0 z-[1000] px-4 pointer-events-none">
         <div className="max-w-[500px] mx-auto pointer-events-auto">
           <div className="bg-white/90 backdrop-blur-2xl border border-slate-100 rounded-2xl p-2 shadow-2xl flex items-center gap-2 overflow-x-auto no-scrollbar">
-             <div className="flex bg-slate-50 rounded-xl p-1 shrink-0">
-                {[{id:'',label:'TODAS'},{id:'1',label:'PUB'},{id:'2',label:'PRI'}].map(s=>(
+              <div className="flex bg-slate-50 rounded-xl p-1 shrink-0">
+                {[{id:'',label:'TODAS'},{id:'2',label:'PUB'},{id:'1',label:'PRI'}].map(s=>(
                   <button key={s.id} onClick={()=>setFilters({...filters,sostenimiento:s.id})} className={`px-3 py-1.5 rounded-lg text-[9px] font-black tracking-widest ${filters.sostenimiento===s.id?'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
                     {s.label}
                   </button>

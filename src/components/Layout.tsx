@@ -43,8 +43,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className={`min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row ${isSidebarHidden ? 'overflow-hidden' : ''}`}>
       {/* Mobile Header - Ultra-premium Glass Header */}
-      {!isSidebarHidden && (
-        <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/70 backdrop-blur-2xl border-b border-slate-100/50 flex items-center justify-between px-6 z-[1001]">
+      {/* Mobile Header (Hidden on LG+) */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-[3000] h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100 p-1.5">
               <Logo size="100%" color="white" />
@@ -68,18 +68,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </button>
             )}
           </div>
-        </div>
-      )}
+        </header>
 
       {/* Sidebar (Mobile Overlay + Desktop Side) */}
       {!isSidebarHidden && (
         <aside className={`
           fixed inset-y-0 left-0 z-[2000] w-72 bg-white border-r border-slate-100 transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1)
-          md:relative md:translate-x-0 md:z-40
+          lg:relative lg:translate-x-0 lg:z-40
           ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
         `}>
-          {/* ... sidebar content remains similar but ensuring it doesn't overlap header on desktop if needed ... */}
-          {/* (I'll keep the sidebar content as is but it will be hidden/shown via toggle) */}
         <div className="h-full flex flex-col py-8 px-6">
           <div className="flex items-center gap-3 mb-10 px-2 outline-none">
             <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-100 p-2">
@@ -97,7 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.path}
                 to={item.path}
                 onClick={() => {
-                   if (window.innerWidth < 768) setIsSidebarOpen(false);
+                   if (window.innerWidth < 1024) setIsSidebarOpen(false);
                 }}
                 className={({ isActive }) => `
                   flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300 group
@@ -137,7 +134,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Sidebar Backdrop (Mobile only) */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[1999] md:hidden animate-fade-in"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[1999] lg:hidden animate-fade-in"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -145,16 +142,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main Content */}
       <main className={`
         flex-1 relative overflow-y-auto h-screen custom-scrollbar transition-all
-        ${!isSidebarHidden ? 'pt-16 md:pt-0 pb-32 md:pb-0' : ''}
+        ${!isSidebarHidden ? 'pt-16 lg:pt-0 pb-32 lg:pb-0' : ''}
       `}>
         <div className="p-4 md:p-10 max-w-[1600px] mx-auto">
           {children}
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation - Premium iOS Pill style */}
-      {!isSidebarHidden && (
-        <div className="md:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] z-[1001] animate-slide-up">
+      {/* Mobile Bottom Navigation (Hidden on LG+) */}
+      <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[4000] w-[92%] max-w-[420px]">
           <div className="relative bg-white/80 backdrop-blur-3xl border border-white/40 px-3 py-2.5 flex items-center justify-around rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] ring-1 ring-slate-900/5 overflow-hidden">
             {menu.map((item) => (
               <NavLink
@@ -180,8 +176,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </NavLink>
             ))}
           </div>
-        </div>
-      )}
+      </nav>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </div>

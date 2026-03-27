@@ -122,11 +122,10 @@ const InstitutionDetail: React.FC = () => {
 
   const scrollTo = (sectionId: string) => {
     const element = document.getElementById(sectionId);
-    const main = document.querySelector('main');
-    if (element && main) {
-      main.scrollTo({
-        top: element.offsetTop - 100,
-        behavior: 'smooth'
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
       });
     }
   };
@@ -213,6 +212,7 @@ const InstitutionDetail: React.FC = () => {
         institucion={institucion} 
         isAdmin={isAdmin}
         onEdit={() => setShowEditModal(true)}
+        onScrollTo={scrollTo}
       />
       
       <InstitutionNav 

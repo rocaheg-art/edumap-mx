@@ -735,31 +735,36 @@ const Observatorio: React.FC = () => {
                  <MousePointer2 size={120} className="text-gray-900" />
                </div>
                <div className="space-y-4 relative z-10">
-                  {[
-                    { label: 'SOLICITUDES', val: data.v6_flujo.solicitudes, color: '#6366f1', pct: 100 },
-                    { label: 'ADMITIDOS', val: data.v6_flujo.admitidos, color: '#8b5cf6', pct: (Number(data.v6_flujo.admitidos)/Number(data.v6_flujo.solicitudes)*100) },
-                    { label: 'PAGO MATRÍCULA', val: data.v6_flujo.matricula, color: '#ec4899', pct: (Number(data.v6_flujo.matricula)/Number(data.v6_flujo.solicitudes)*100) },
-                    { label: 'EGRESADOS', val: data.v6_flujo.egresados, color: '#f43f5e', pct: (Number(data.v6_flujo.egresados)/Number(data.v6_flujo.solicitudes)*100) },
-                    { label: 'TITULADOS', val: data.v6_flujo.titulados, color: '#fbbf24', pct: (Number(data.v6_flujo.titulados)/Number(data.v6_flujo.solicitudes)*100) },
-                  ].map((step, i) => (
-                    <motion.div 
-                      key={step.label}
-                      initial={{ opacity: 0, scaleX: 0 }}
-                      whileInView={{ opacity: 1, scaleX: 1 }}
-                      transition={{ delay: i * 0.15, duration: 1 }}
-                      style={{ originX: 0.5, width: `${Math.max(step.pct, 5)}%`, margin: '0 auto' }}
-                      className="group cursor-default"
-                    >
-                      <div 
-                        className="h-16 md:h-24 rounded-2xl flex items-center justify-between px-10 transition-all hover:brightness-110 shadow-lg relative overflow-hidden"
-                        style={{ backgroundColor: step.color }}
+                  {(() => { 
+                    const flowSteps = [
+                      { label: 'SOLICITUDES', val: Number(data.v6_flujo.solicitudes), color: '#6366f1' },
+                      { label: 'ADMITIDOS', val: Number(data.v6_flujo.admitidos), color: '#8b5cf6' },
+                      { label: 'PAGO MATRÍCULA', val: Number(data.v6_flujo.matricula), color: '#ec4899' },
+                      { label: 'EGRESADOS', val: Number(data.v6_flujo.egresados), color: '#f43f5e' },
+                      { label: 'TITULADOS', val: Number(data.v6_flujo.titulados), color: '#fbbf24' },
+                    ];
+                    const maxVal = Math.max(...flowSteps.map(s => s.val));
+                    
+                    return flowSteps.map((step, i) => (
+                      <motion.div 
+                        key={step.label}
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        whileInView={{ opacity: 1, scaleX: 1 }}
+                        transition={{ delay: i * 0.15, duration: 1 }}
+                        style={{ originX: 0.5, width: `${Math.max((step.val / maxVal) * 100, 5)}%`, margin: '0 auto' }}
+                        className="group cursor-default"
                       >
-                         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
-                         <span className="text-[10px] md:text-sm font-black tracking-[0.2em] text-white relative z-10">{step.label}</span>
-                         <span className="text-xl md:text-3xl font-black text-white relative z-10">{Number(step.val).toLocaleString()}</span>
-                      </div>
-                    </motion.div>
-                  ))}
+                        <div 
+                          className="h-16 md:h-24 rounded-2xl flex items-center justify-between px-10 transition-all hover:brightness-110 shadow-lg relative overflow-hidden"
+                          style={{ backgroundColor: step.color }}
+                        >
+                           <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                           <span className="text-[10px] md:text-sm font-black tracking-[0.2em] text-white relative z-10">{step.label}</span>
+                           <span className="text-xl md:text-3xl font-black text-white relative z-10">{step.val.toLocaleString()}</span>
+                        </div>
+                      </motion.div>
+                    ));
+                  })()}
                </div>
                
                <div className="mt-20 text-center">

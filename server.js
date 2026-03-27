@@ -335,8 +335,8 @@ async function startServer() {
       const params = [];
 
       if (sector) {
-        if (sector === 'pub') conditions.push("inst.id_sostenimiento = 1");
-        if (sector === 'priv') conditions.push("inst.id_sostenimiento = 2");
+        if (sector === 'pub') conditions.push("inst.id_sostenimiento = 2");
+        if (sector === 'priv') conditions.push("inst.id_sostenimiento = 1");
       }
 
       if (campo) {
