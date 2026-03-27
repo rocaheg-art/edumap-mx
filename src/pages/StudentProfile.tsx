@@ -3,7 +3,7 @@ import { Mail, GraduationCap, MapPin, Star, Clock, ChevronRight, Settings, Bell,
 import { useAuth } from '../context/AuthContext';
 import { useFavorites } from '../hooks/useFavorites';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const StudentProfile: React.FC = () => {
   const { user } = useAuth();

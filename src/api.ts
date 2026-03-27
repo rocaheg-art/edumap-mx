@@ -21,6 +21,20 @@ import {
 
 const API_URL = '/api'; 
 
+export interface ObservatorioKPIs {
+  matricula_total: number;
+  nuevo_ingreso: number;
+  egresados: number;
+  titulados: number;
+  total_ofertas: number;
+  total_instituciones: number;
+  solicitudes: number;
+  aspirantes_por_lugar: number;
+  pct_mujeres: number;
+  edad_media: number | null;
+  eficiencia_global: number;
+}
+
 // Mock Data for fallback with VALID coordinates for map
 export const MOCK_INSTITUCIONES: Institucion[] = [
   { 
@@ -432,3 +446,30 @@ export const getEscuelas = () => apiCall<Escuela[]>('/escuelas').then(list => (l
     longitud: parseFloat(String(e.longitud)) || 0,
     promedio_calificacion: Number(e.promedio_calificacion) || 0
 })));
+
+export const getObservatorioKPIs = () => apiCall<ObservatorioKPIs>('/observatorio/kpis');
+
+export const getStatsResumen = () => apiCall<{ estudiantes: string, instituciones: string, programas: string, ipd_nacional: string }>('/stats/resumen');
+
+export const getTopCarrerasIPD = (limit = 5) => apiCall<{ carrera: string, institucion: string, ipd: string }[]>(`/carreras/top-ipd?limit=${limit}`);
+
+export interface MapInstitution {
+  id: number;
+  nombre: string;
+  siglas: string;
+  sector: string;
+  lat: number;
+  lng: number;
+  ciudad: string;
+  matricula: number;
+  num_programas: number;
+  ipd: number;
+  pct_mujeres: number;
+}
+
+export const getInstitucionesMapa = (filters: { sector?: string, campo?: string } = {}) => {
+  const params = new URLSearchParams();
+  if (filters.sector) params.append('sector', filters.sector);
+  if (filters.campo) params.append('campo', filters.campo);
+  return apiCall<MapInstitution[]>(`/instituciones/mapa?${params.toString()}`);
+};

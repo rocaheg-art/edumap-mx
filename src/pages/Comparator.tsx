@@ -5,7 +5,7 @@ import {
   Trash2, RotateCcw, Building2, BookOpen, GraduationCap, MapPin,
   TrendingUp, Users, Award
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { searchOfertas, getFilters } from '../api';
 import { Oferta } from '../types';
 import RadarChart from '../components/comparator/RadarChart';
@@ -40,6 +40,13 @@ const Comparator: React.FC = () => {
         sostenimiento: ''
     });
     const [catalogs, setCatalogs] = useState<any>({ estados: [], niveles: [], campos: [] });
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const loadCatalogs = async () => {
@@ -441,60 +448,48 @@ const Comparator: React.FC = () => {
 
             {/* Search and Filters */}
             <div className="flex flex-col gap-6">
-                <div className="flex flex-col lg:flex-row gap-4">
-                    <div className="flex-1 relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={22} />
+                <div className="flex flex-col gap-4">
+                    <div className="relative group">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={isMobile ? 18 : 22} />
                         <input 
                             type="text"
                             placeholder="Buscar por programa o universidad..."
-                            className="w-full pl-16 pr-8 py-5 bg-white border border-slate-100 rounded-[24px] shadow-sm outline-none focus:ring-4 focus:ring-indigo-50 transition-all font-bold text-slate-900 placeholder:text-slate-400"
+                            className="w-full pl-16 pr-8 py-4 md:py-5 bg-white border border-slate-100 rounded-[20px] md:rounded-[24px] shadow-sm outline-none focus:ring-4 focus:ring-indigo-50 transition-all font-bold text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-3">
-                        <select 
-                            value={filters.estado}
-                            onChange={(e) => setFilters(prev => ({ ...prev, estado: e.target.value }))}
-                            className="bg-white border border-slate-100 rounded-[20px] px-6 py-4 text-xs font-black text-slate-900 outline-none focus:ring-4 focus:ring-indigo-50 shadow-sm transition-all appearance-none cursor-pointer"
-                        >
-                            <option value="">Todos los Estados</option>
-                            {catalogs.estados?.map((e: any) => <option key={e.id_entidad} value={e.id_entidad}>{e.nombre}</option>)}
-                        </select>
-                        <select 
-                            value={filters.sostenimiento}
-                            onChange={(e) => setFilters(prev => ({ ...prev, sostenimiento: e.target.value }))}
-                            className="bg-white border border-slate-100 rounded-[20px] px-6 py-4 text-xs font-black text-slate-900 outline-none focus:ring-4 focus:ring-indigo-50 shadow-sm transition-all appearance-none cursor-pointer"
-                        >
-                            <option value="">Todos los Sectores</option>
-                            <option value="2">Pública</option>
-                            <option value="1">Particular</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* State and Municipality Filters */}
-                <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Ubicación Geográfica:</div>
-                    <div className="flex flex-col md:flex-row gap-4">
+                    
+                    <div className="flex flex-wrap md:flex-nowrap gap-2 md:gap-3">
                         <select 
                             value={filters.estado}
                             onChange={(e) => setFilters(prev => ({ ...prev, estado: e.target.value, municipio: '' }))}
-                            className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-indigo-50 transition-all appearance-none cursor-pointer"
+                            className="flex-1 min-w-[140px] bg-white border border-slate-100 rounded-[16px] md:rounded-[20px] px-4 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-black text-slate-900 outline-none focus:ring-4 focus:ring-indigo-50 shadow-sm transition-all appearance-none cursor-pointer"
                         >
-                            <option value="">Todos los Estados</option>
+                            <option value="">Estado</option>
                             {catalogs.estados?.map((e: any) => <option key={e.id_entidad} value={e.id_entidad}>{e.nombre}</option>)}
                         </select>
+
                         <select 
                             value={filters.municipio}
                             onChange={(e) => setFilters(prev => ({ ...prev, municipio: e.target.value }))}
                             disabled={!filters.estado}
-                            className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-indigo-50 transition-all appearance-none cursor-pointer disabled:opacity-50"
+                            className="flex-1 min-w-[140px] bg-white border border-slate-100 rounded-[16px] md:rounded-[20px] px-4 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-black text-slate-900 outline-none focus:ring-4 focus:ring-indigo-50 shadow-sm transition-all appearance-none cursor-pointer disabled:opacity-50"
                         >
-                            <option value="">Todos los Municipios</option>
+                            <option value="">Municipio</option>
                             {catalogs.municipios?.filter((m: any) => m.id_entidad === parseInt(filters.estado)).map((m: any) => (
                                 <option key={m.id_municipio} value={m.id_municipio}>{m.nombre}</option>
                             ))}
+                        </select>
+
+                        <select 
+                            value={filters.sostenimiento}
+                            onChange={(e) => setFilters(prev => ({ ...prev, sostenimiento: e.target.value }))}
+                            className="flex-1 min-w-[140px] bg-white border border-slate-100 rounded-[16px] md:rounded-[20px] px-4 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-black text-slate-900 outline-none focus:ring-4 focus:ring-indigo-50 shadow-sm transition-all appearance-none cursor-pointer"
+                        >
+                            <option value="">Sector</option>
+                            <option value="2">Pública</option>
+                            <option value="1">Particular</option>
                         </select>
                     </div>
                 </div>

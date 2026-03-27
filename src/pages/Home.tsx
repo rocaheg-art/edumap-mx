@@ -11,9 +11,13 @@ import {
   GraduationCap,
   X,
   ArrowRight,
-  Building2
+  Building2,
+  BarChart2,
+  Map as MapIcon
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useUI } from '../context/UIContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import Logo from '../components/Logo';
 import { 
   getEscuelasMap, 
   searchCarreras, 
@@ -38,6 +42,9 @@ const Home: React.FC = () => {
   const [instSuggestions, setInstSuggestions] = useState<Institucion[]>([]);
   const [selectedCarrera, setSelectedCarrera] = useState<Carrera | null>(null);
   const navigate = useNavigate();
+  const { setSidebarHidden, hasSeenWelcome, markWelcomeAsSeen } = useUI();
+  const [showWelcome, setShowWelcome] = useState(!hasSeenWelcome);
+  const [highlight, setHighlight] = useState<string>('');
 
   // Offers of the selected school
   const [selectedEscuelaOfertas, setSelectedEscuelaOfertas] = useState<Oferta[]>([]);
@@ -61,6 +68,55 @@ const Home: React.FC = () => {
   });
 
   const [showFilters, setShowFilters] = useState(false);
+
+  // Sync sidebar visibility
+  useEffect(() => {
+    if (showWelcome) {
+      setSidebarHidden(true);
+    } else {
+      // Small delay when entering the app from welcome to avoid layout jumps
+      const timer = setTimeout(() => setSidebarHidden(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [showWelcome, setSidebarHidden]);
+
+  // Load Highlights
+  useEffect(() => {
+    if (showWelcome) {
+      const fetchHighlights = async () => {
+        try {
+          const resp = await fetch('/observatorio_data.json');
+          if (!resp.ok) return;
+          const data = await resp.json();
+          const facts = [];
+          
+          if (data.counters) {
+            facts.push(`México cuenta con más de ${data.counters.total_programas.toLocaleString()} programas de educación superior.`);
+            facts.push(`Actualmente se registran ${(data.counters.total_estudiantes / 1000000).toFixed(1)} millones de alumnos en el sistema.`);
+          }
+          if (data.v4_dificultad && data.v4_dificultad.length > 0) {
+            facts.push(`¿Sabías que "${data.v4_dificultad[0].carrera}" es una de las carreras con mayor competencia por lugar?`);
+          }
+          if (data.v2_genero) {
+            const topWomen = [...data.v2_genero].sort((a,b) => (b.mujeres/b.total) - (a.mujeres/a.total))[0];
+            if (topWomen) facts.push(`El área de ${topWomen.campo_amplio} destaca por tener la mayor proporción de mujeres estudiantes.`);
+          }
+          
+          if (facts.length > 0) {
+            setHighlight(facts[Math.floor(Math.random() * facts.length)]);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      fetchHighlights();
+    }
+  }, [showWelcome]);
+
+  const handleEnterApp = () => {
+    setShowWelcome(false);
+    markWelcomeAsSeen();
+  };
 
   useEffect(() => {
     const loadCatalogs = async () => {
@@ -235,14 +291,100 @@ const Home: React.FC = () => {
   }, [filters, selectedSubsistema]);
 
   return (
-    <div className="flex flex-col gap-8 animate-fade-in pb-20">
+    <div className="relative min-h-screen">
+      <AnimatePresence mode="wait">
+        {showWelcome ? (
+          <motion.section 
+            key="welcome"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed inset-0 z-[2000] bg-white flex flex-col items-center justify-center p-8 overflow-hidden"
+          >
+            {/* Animated Background Elements */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-pulse" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-50 rounded-full blur-[120px] opacity-60 animate-pulse" />
+
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: 'spring' }}
+              className="relative z-10 flex flex-col items-center text-center"
+            >
+              <div className="w-28 h-28 bg-indigo-600 text-white rounded-[40px] flex items-center justify-center shadow-2xl shadow-indigo-200 mb-8 border-4 border-white p-5">
+                <Logo size="100%" color="white" />
+              </div>
+              
+              <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter mb-4 leading-none px-4">
+                EduMap <span className="text-indigo-600">México</span>
+              </h1>
+              
+              <p className="text-xl text-slate-500 font-medium max-w-xl mb-12 leading-relaxed">
+                Explora el futuro de la educación superior en México con datos oficiales y herramientas inteligentes.
+              </p>
+
+              <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full max-w-md px-6">
+                <button 
+                  onClick={handleEnterApp}
+                  className="group relative flex-1 flex flex-row md:flex-col items-center gap-4 p-5 md:p-8 bg-white border border-slate-100 rounded-[32px] md:rounded-[40px] shadow-xl hover:shadow-2xl hover:border-indigo-200 transition-all hover:-translate-y-2 active:scale-95 text-left md:text-center"
+                >
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shrink-0">
+                    <Search size={24} md={32} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <span className="block font-black text-slate-900 text-base md:text-lg uppercase tracking-tight">Explorar</span>
+                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Busca tu carrera</span>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => navigate('/observatorio')}
+                  className="group relative flex-1 flex flex-row md:flex-col items-center gap-4 p-5 md:p-8 bg-white border border-slate-100 rounded-[32px] md:rounded-[40px] shadow-xl hover:shadow-2xl hover:border-emerald-200 transition-all hover:-translate-y-2 active:scale-95 text-left md:text-center"
+                >
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
+                    <BarChart2 size={24} md={32} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <span className="block font-black text-slate-900 text-base md:text-lg uppercase tracking-tight">Observatorio</span>
+                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Estadísticas</span>
+                  </div>
+                </button>
+              </div>
+
+              {/* Curious Fact Badge */}
+              {highlight && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                  className="mt-8 md:mt-12 flex items-center gap-4 px-6 py-4 bg-slate-50 border border-slate-100 rounded-[24px] md:rounded-3xl max-w-lg mx-6"
+                >
+                  <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shrink-0">
+                    <Compass size={20} />
+                  </div>
+                  <p className="text-xs md:text-sm font-bold text-slate-600 text-left">
+                    <span className="text-indigo-600 uppercase text-[9px] md:text-[10px] tracking-widest block mb-0.5">Dato Curioso</span>
+                    {highlight}
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.section>
+        ) : (
+          <motion.div 
+            key="main"
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="flex flex-col gap-8 animate-fade-in pb-20"
+          >
       {/* --- HERO & SEARCH SECTION --- */}
       <section className="relative pt-12 pb-8">
         <div className="max-w-4xl mx-auto text-center mb-12">
             <motion.h1 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none text-slate-900"
+                className="text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-6 leading-none text-slate-900 px-4"
             >
                 Encuentra tu <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500">Futuro Académico</span>
@@ -432,15 +574,15 @@ const Home: React.FC = () => {
 
       {/* --- FILTERS & MAP SECTION --- */}
       <div ref={mapSectionRef} className="flex flex-col gap-4">
-        {/* Horizontal Filter Bar */}
-        <div className="flex flex-wrap items-center gap-3 p-4 bg-white border border-slate-100 rounded-[32px] shadow-sm">
+        {/* Filter Bar - Responsive & Scrollable */}
+        <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-2 -mx-4 px-4 md:mx-0 md:px-0 md:pb-8 md:mb-0 no-scrollbar scroll-smooth">
             {/* Estado */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-2xl border border-transparent focus-within:border-indigo-100 transition-all">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm focus-within:border-indigo-100 transition-all shrink-0">
                 <MapPin size={14} className="text-indigo-500" />
                 <select 
                     value={filters.estado}
                     onChange={(e) => setFilters({ ...filters, estado: e.target.value, municipio: '' })}
-                    className="bg-transparent border-none text-xs font-bold text-slate-700 outline-none cursor-pointer pr-4"
+                    className="bg-transparent border-none text-[11px] font-bold text-slate-700 outline-none cursor-pointer pr-4"
                 >
                     <option value="">Todos los Estados</option>
                     {catalogs.estados.map(e => <option key={e.id_entidad} value={e.id_entidad}>{e.nombre}</option>)}
@@ -448,13 +590,13 @@ const Home: React.FC = () => {
             </div>
 
             {/* Municipio */}
-            <div className={`flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-2xl border border-transparent focus-within:border-indigo-100 transition-all ${!filters.estado ? 'opacity-50' : ''}`}>
-                <MapPin size={14} className="text-violet-500" />
+            <div className={`flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm focus-within:border-indigo-100 transition-all shrink-0 ${!filters.estado ? 'opacity-50' : ''}`}>
+                <Search size={14} className="text-violet-500" />
                 <select 
                     value={filters.municipio}
                     disabled={!filters.estado}
                     onChange={(e) => setFilters({ ...filters, municipio: e.target.value })}
-                    className="bg-transparent border-none text-xs font-bold text-slate-700 outline-none cursor-pointer pr-4 disabled:cursor-not-allowed"
+                    className="bg-transparent border-none text-[11px] font-bold text-slate-700 outline-none cursor-pointer pr-4 disabled:cursor-not-allowed"
                 >
                     <option value="">Todos los Municipios</option>
                     {activeMunicipios.map(m => <option key={m.id_municipio} value={m.id_municipio}>{m.nombre}</option>)}
@@ -462,12 +604,12 @@ const Home: React.FC = () => {
             </div>
 
             {/* Nivel */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-2xl border border-transparent focus-within:border-indigo-100 transition-all">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm focus-within:border-indigo-100 transition-all shrink-0">
                 <GraduationCap size={14} className="text-emerald-500" />
                 <select 
                     value={filters.nivel}
                     onChange={(e) => setFilters({ ...filters, nivel: e.target.value })}
-                    className="bg-transparent border-none text-xs font-bold text-slate-700 outline-none cursor-pointer pr-4"
+                    className="bg-transparent border-none text-[11px] font-bold text-slate-700 outline-none cursor-pointer pr-4"
                 >
                     <option value="">Todos los Niveles</option>
                     {catalogs.niveles.map(n => <option key={n.id_nivel} value={n.id_nivel}>{n.nombre.includes('TÉCNICO') ? 'TSU' : (n.nombre.includes('NORMAL') ? 'NORMAL' : (n.nombre.includes('LICENCIATURA') ? 'LICENCIATURA' : n.nombre))}</option>)}
@@ -475,7 +617,7 @@ const Home: React.FC = () => {
             </div>
 
             {/* Sostenimiento */}
-            <div className="flex items-center p-1 bg-slate-50 rounded-2xl gap-1">
+            <div className="flex items-center p-1 bg-white rounded-2xl border border-slate-100 shadow-sm gap-1 shrink-0">
                 {[
                     { id: '', label: 'Todas' },
                     { id: '1', label: 'Públicas' },
@@ -486,7 +628,7 @@ const Home: React.FC = () => {
                         onClick={() => setFilters({ ...filters, sostenimiento: s.id })}
                         className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${
                             filters.sostenimiento === s.id
-                            ? 'bg-white text-indigo-600 shadow-sm'
+                            ? 'bg-slate-100 text-indigo-600 shadow-sm'
                             : 'text-slate-400 hover:text-slate-600'
                         }`}
                     >
@@ -495,19 +637,18 @@ const Home: React.FC = () => {
                 ))}
             </div>
 
-            <div className="flex-1" />
+            <div className="hidden md:block flex-1" />
 
-            <div className="flex items-center gap-4 px-4">
+            <div className="flex items-center gap-3 px-4 shrink-0">
                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{filteredEscuelas.length} Instituciones</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none whitespace-nowrap">{filteredEscuelas.length} Instituciones</span>
                 </div>
                 <button 
                     onClick={resetFilters}
-                    className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                    title="Limpiar filtros"
+                    className="p-1 text-slate-400 hover:text-red-500 transition-colors"
                 >
-                    <X size={18} />
+                    <X size={16} />
                 </button>
             </div>
         </div>
@@ -562,16 +703,14 @@ const Home: React.FC = () => {
             <AnimatePresence>
               {selectedEscuela && (
                 <motion.div
-                  initial={window.innerWidth < 768 ? { y: '100%', opacity: 0 } : { x: '100%', opacity: 0 }}
-                  animate={window.innerWidth < 768 ? { y: 0, opacity: 1 } : { x: 0, opacity: 1 }}
-                  exit={window.innerWidth < 768 ? { y: '100%', opacity: 0 } : { x: '100%', opacity: 0 }}
-                  transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                  initial={{ y: '100%', opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: '100%', opacity: 0 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                   className={`
                     absolute z-[1002] bg-white/95 backdrop-blur-xl border border-slate-100/50 flex flex-col overflow-hidden
-                    ${window.innerWidth < 768 
-                      ? 'left-0 right-0 bottom-0 top-auto h-[70vh] rounded-t-[40px] shadow-[0_-12px_40px_rgba(0,0,0,0.1)]' 
-                      : 'top-6 right-6 bottom-6 w-[310px] rounded-[32px] shadow-2xl'
-                    }
+                    md:top-6 md:right-6 md:bottom-6 md:w-[320px] md:rounded-[32px] md:shadow-2xl md:fixed
+                    left-0 right-0 bottom-0 top-auto h-[75vh] md:h-auto rounded-t-[40px] shadow-[0_-12px_50px_rgba(0,0,0,0.15)]
                   `}
                 >
                   {/* Handle for Bottom Sheet on mobile */}
@@ -742,6 +881,9 @@ const Home: React.FC = () => {
           </div>
       </div>
 
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

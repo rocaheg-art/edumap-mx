@@ -242,6 +242,160 @@ async function startServer() {
     }
   });
 
+
+  // --- NUEVOS ENDPOINTS PARA HOME REDISEÑADA ---
+
+  // Resumen de estadísticas nacionales
+  app.get('/api/stats/resumen', async (req, res) => {
+    try {
+      const [row] = await query(`
+        SELECT 
+          SUM(o.matricula_total) AS estudiantes,
+          COUNT(DISTINCT o.id_institucion) AS instituciones,
+          COUNT(DISTINCT o.id_oferta) AS programas,
+          SUM(COALESCE(ei.solicitudes_total, 0)) AS solicitudes,
+          SUM(o.nuevo_ingreso_total) AS nuevo_ingreso
+        FROM ofertas o
+        LEFT JOIN estadisticas_inclusion ei ON o.id_oferta = ei.id_oferta
+      `);
+      
+      const sol = Number(row.solicitudes || 0);
+      const ni = Number(row.nuevo_ingreso || 1);
+      
+      res.json({
+        estudiantes: Number(row.estudiantes || 5500000).toLocaleString(),
+        instituciones: Number(row.instituciones || 4332).toLocaleString(),
+        programas: Number(row.programas || 14475).toLocaleString(),
+        ipd_nacional: (sol / ni).toFixed(2) + 'x'
+      });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Carreras más competitivas (Top IPD)
+  app.get('/api/carreras/top-ipd', async (req, res) => {
+    const limit = Number(req.query.limit) || 5;
+    try {
+      const sql = `
+        SELECT 
+          c.nombre AS carrera,
+          inst.siglas AS inst_siglas,
+          en.nombre AS entidad,
+          (COALESCE(ei.solicitudes_total, 0) / NULLIF(o.nuevo_ingreso_total, 0)) AS ipd_val
+        FROM ofertas o
+        JOIN carreras c ON o.id_carrera = c.id_carrera
+        JOIN instituciones inst ON o.id_institucion = inst.id_institucion
+        JOIN escuelas esc ON inst.id_institucion = esc.id_institucion
+        JOIN municipios m ON esc.id_municipio = m.id_municipio
+        JOIN entidades en ON m.id_entidad = en.id_entidad
+        LEFT JOIN estadisticas_inclusion ei ON o.id_oferta = ei.id_oferta
+        WHERE o.nuevo_ingreso_total > 0
+        GROUP BY o.id_oferta
+        ORDER BY ipd_val DESC
+        LIMIT ?
+      `;
+      const rows = await query(sql, [limit]);
+      res.json(rows.map(r => ({
+        carrera: r.carrera,
+        institucion: `${r.inst_siglas || 'IES'} · ${r.entidad}`,
+        ipd: Number(r.ipd_val || 0).toFixed(1) + 'x'
+      })));
+    } catch(e) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Instituciones para el Mapa (Optimizado)
+  app.get('/api/instituciones/mapa', async (req, res) => {
+    const { sector, campo } = req.query;
+    try {
+      let sql = `
+        SELECT 
+          inst.id_institucion,
+          inst.nombre,
+          inst.siglas,
+          inst.logo_url,
+          sost.nombre AS sector_nombre,
+          esc.latitud,
+          esc.longitud,
+          m.nombre AS ciudad,
+          en.nombre AS estado,
+          SUM(o.matricula_total) AS matricula_total,
+          COUNT(DISTINCT o.id_oferta) AS num_programas,
+          SUM(COALESCE(ei.solicitudes_total, 0)) AS total_solicitudes,
+          SUM(o.nuevo_ingreso_total) AS total_ingreso,
+          SUM(o.matricula_mujeres) AS total_mujeres
+        FROM instituciones inst
+        JOIN escuelas esc ON inst.id_institucion = esc.id_institucion
+        JOIN municipios m ON esc.id_municipio = m.id_municipio
+        JOIN entidades en ON m.id_entidad = en.id_entidad
+        JOIN sostenimientos sost ON inst.id_sostenimiento = sost.id_sostenimiento
+        JOIN ofertas o ON inst.id_institucion = o.id_institucion
+        LEFT JOIN estadisticas_inclusion ei ON o.id_oferta = ei.id_oferta
+      `;
+
+      const conditions = [];
+      const params = [];
+
+      if (sector) {
+        if (sector === 'pub') conditions.push("inst.id_sostenimiento = 1");
+        if (sector === 'priv') conditions.push("inst.id_sostenimiento = 2");
+      }
+
+      if (campo) {
+        const campoMap = {
+          'Salud': 'CIENCIAS DE LA SALUD',
+          'Ingeniería': 'INGENIERÍA, MANUFACTURA Y CONSTRUCCIÓN',
+          'TIC': 'TECNOLOGÍAS DE LA INFORMACIÓN Y LA COMUNICACIÓN'
+        };
+        const mappedCampo = campoMap[campo];
+        if (mappedCampo) {
+          conditions.push(`
+            o.id_carrera IN (
+              SELECT c2.id_carrera 
+              FROM carreras c2 
+              JOIN campos_detallados cd2 ON c2.id_campo_detallado = cd2.id_campo_detallado
+              JOIN campos_especificos ce2 ON cd2.id_campo_especifico = ce2.id_campo_especifico
+              JOIN campos_amplios ca2 ON ce2.id_campo_amplio = ca2.id_campo_amplio
+              WHERE ca2.nombre = ?
+            )
+          `);
+          params.push(mappedCampo);
+        }
+      }
+
+      if (conditions.length > 0) {
+        sql += " WHERE " + conditions.join(" AND ");
+      }
+
+      sql += " GROUP BY inst.id_institucion, esc.id_escuela ORDER BY matricula_total DESC LIMIT 2000";
+
+      const rows = await query(sql, params);
+      res.json(rows.map(r => {
+        const sol = Number(r.total_solicitudes || 0);
+        const ing = Number(r.total_ingreso || 1);
+        const mat = Number(r.matricula_total || 0);
+        // Mock rating based on ID to keep it stable but varied
+        const mockRating = (4.2 + (r.id_institucion % 8) / 10).toFixed(1);
+
+        return {
+          id: r.id_institucion,
+          nombre: r.nombre,
+          siglas: r.siglas,
+          logo: r.logo_url,
+          sector: r.sector_nombre,
+          lat: parseFloat(r.latitud),
+          lng: parseFloat(r.longitud),
+          ciudad: `${r.ciudad}, ${r.estado}`,
+          matricula: mat,
+          num_programas: r.num_programas,
+          ipd: ing > 0 ? (sol / ing) : 1,
+          pct_mujeres: mat > 0 ? (Number(r.total_mujeres || 0) / mat) * 100 : 50,
+          rating: mockRating
+        };
+      }));
+    } catch(e) { 
+      res.status(500).json({ error: e.message }); 
+    }
+  });
+
   app.get('/api/instituciones/:id', async (req, res) => {
       try {
           const instId = req.params.id;
@@ -393,10 +547,15 @@ async function startServer() {
       const pageVal = parseInt(page) || 1;
       const offsetVal = (pageVal - 1) * limitVal;
       
-      const countSql = `SELECT COUNT(*) as total, AVG(NULLIF(o.eficiencia_terminal, 0)) as globalEficiencia ` + baseJoins;
+      const countSql = `
+        SELECT 
+          COUNT(*) as total, 
+          AVG(NULLIF(o.eficiencia_terminal, 0)) as efficiencyFromColumn,
+          (SUM(o.titulados_total) * 100.0 / NULLIF(SUM(o.egresados_total), 0)) as calculatedEfficiency
+      ` + baseJoins;
       const countResults = await query(countSql, params);
       const total = countResults[0]?.total || 0;
-      const globalEficiencia = countResults[0]?.globalEficiencia || 0;
+      const globalEficiencia = countResults[0]?.calculatedEfficiency || countResults[0]?.efficiencyFromColumn || 0;
 
       sql += ` LIMIT ? OFFSET ?`;
       params.push(limitVal, offsetVal);
@@ -841,6 +1000,7 @@ async function startServer() {
       res.json(rows);
     } catch(e) { res.status(500).json({ error: e.message }); }
   });
+
 
   app.post('/api/escuelas', async (req, res) => {
       const { id_institucion, id_municipio, nombre, latitud, longitud } = req.body;

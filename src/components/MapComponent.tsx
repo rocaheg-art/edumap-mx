@@ -280,49 +280,49 @@ const MapComponent: React.FC<MapComponentProps> = ({
       {/* Map Controls/Overlay */}
       {!simpleMode && (
         <>
-          <div className="absolute top-6 left-6 z-[1000] flex flex-col gap-3">
-            <div className="bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-white/50 flex items-center gap-2">
-              <div className="p-2 bg-indigo-600 text-white rounded-xl">
-                <Search size={18} />
+          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-[1000] flex flex-col gap-2 md:gap-3">
+            <div className="bg-white/90 backdrop-blur-md p-1.5 md:p-2 rounded-xl md:rounded-2xl shadow-xl border border-white/50 flex items-center gap-2">
+              <div className="p-1.5 md:p-2 bg-indigo-600 text-white rounded-lg">
+                <Search size={isMobile ? 14 : 18} />
               </div>
-              <div className="pr-4">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mostrando</div>
-                <div className="text-sm font-bold text-slate-900">{visibleEscuelas.length} instituciones</div>
+              <div className="pr-2 md:pr-4">
+                <div className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mostrando</div>
+                <div className="text-xs md:text-sm font-bold text-slate-900">{visibleEscuelas.length} inst.</div>
               </div>
               {loadingGeo && (
-                <div className="pr-4 border-l border-slate-100 pl-4">
-                  <Compass className="w-5 h-5 text-indigo-600 animate-spin" />
+                <div className="pr-2 md:pr-4 border-l border-slate-100 pl-2 md:pl-4">
+                  <Compass className="w-4 h-4 md:w-5 md:h-5 text-indigo-600 animate-spin" />
                 </div>
               )}
             </div>
 
             <button 
               onClick={handleResetView}
-              className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/50 text-indigo-600 hover:bg-white transition-all flex items-center gap-2 text-xs font-bold"
+              className="bg-white/90 backdrop-blur-md p-2.5 md:p-3 rounded-xl md:rounded-2xl shadow-xl border border-white/50 text-indigo-600 hover:bg-white transition-all flex items-center gap-2 text-[10px] md:text-xs font-bold"
             >
-              <Compass size={16} />
-              Reiniciar Vista
+              <Compass size={isMobile ? 14 : 16} />
+              Reiniciar
             </button>
 
             <button 
               onClick={handleGeolocation}
-              className="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/50 text-emerald-600 hover:bg-white transition-all flex items-center gap-2 text-xs font-bold"
+              className="bg-white/90 backdrop-blur-md p-2.5 md:p-3 rounded-xl md:rounded-2xl shadow-xl border border-white/50 text-emerald-600 hover:bg-white transition-all flex items-center gap-2 text-[10px] md:text-xs font-bold"
             >
-              <Locate size={16} />
-              Mi Ubicación
+              <Locate size={isMobile ? 14 : 16} />
+              Ubicación
             </button>
           </div>
 
 
           {/* Legend */}
-          <div className="absolute bottom-6 left-6 z-[1000] bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-white/50 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-indigo-600 border-2 border-white shadow-sm" />
-              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Públicas</span>
+          <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-[1000] bg-white/90 backdrop-blur-md px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl shadow-xl border border-white/50 space-y-1.5 md:space-y-2">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-indigo-600 border border-white shadow-sm" />
+              <span className="text-[8px] md:text-[10px] font-bold text-slate-600 uppercase tracking-wider">PUBS</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-600 border-2 border-white shadow-sm" />
-              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Privadas</span>
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-600 border border-white shadow-sm" />
+              <span className="text-[8px] md:text-[10px] font-bold text-slate-600 uppercase tracking-wider">PRIS</span>
             </div>
           </div>
         </>

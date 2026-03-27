@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, ZAxis, Cell, PieChart, Pie, Legend,
@@ -113,7 +113,7 @@ const SectionHeader = ({ badge, title, highlight, description, color }: any) => 
     <motion.h2 
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-[0.9] text-gray-900"
+      className="text-4xl md:text-7xl font-black tracking-tighter mb-6 leading-[0.9] text-gray-900 px-4"
     >
       {title} <br />
       <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(to right, ${color}, ${color}90)` }}>
@@ -149,7 +149,7 @@ const SurprisingFact = ({ fact, color }: any) => (
     <div className="text-base font-black uppercase tracking-[0.3em] mb-4" style={{ color }}>
       Dato Sorprendente
     </div>
-    <div className="text-4xl md:text-6xl font-black tracking-tighter leading-[1] text-gray-900">
+    <div className="text-3xl md:text-6xl font-black tracking-tighter leading-[1] text-gray-900">
       {fact}
     </div>
   </motion.div>
@@ -159,9 +159,9 @@ const ChartContainer = ({ children, height = 400 }: any) => (
   <motion.div 
     initial={{ opacity: 0, y: 40 }}
     whileInView={{ opacity: 1, y: 0 }}
-    className="bg-gray-50 border border-gray-100 rounded-[48px] p-8 md:p-12 shadow-sm overflow-hidden relative"
+    className="bg-gray-50 border border-gray-100 rounded-[32px] md:rounded-[48px] p-6 md:p-12 shadow-sm overflow-hidden relative"
   >
-    <div className="h-full w-full" style={{ height }}>
+    <div className="h-full w-full" style={{ height: window.innerWidth < 768 ? height * 0.8 : height }}>
       {children}
     </div>
   </motion.div>
@@ -350,7 +350,7 @@ const Observatorio: React.FC = () => {
             <Layers className="text-violet-600" size={24} />
             <span className="text-xs font-black uppercase tracking-[0.5em] text-gray-400">EduMap MX · Observatorio Estadístico</span>
           </motion.div>
-          <h1 className="text-7xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.85] text-gray-900">
+          <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.85] text-gray-900 px-4">
             Radiografía <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-cyan-500 to-amber-500">
               Superior MX
@@ -372,8 +372,8 @@ const Observatorio: React.FC = () => {
       </section>
 
       {/* --- KPI SECTION --- */}
-      <section className="py-24 px-6 max-w-7xl mx-auto relative border-b border-gray-50">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <section className="py-16 md:py-24 px-6 max-w-7xl mx-auto relative border-b border-gray-50">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           <AnimatedCounter icon={Users} color={COLORS.accent} label="Matrícula Total" value={data.counters.total_estudiantes} />
           <AnimatedCounter icon={School} color={COLORS.secondary} label="IBS & Campus" value={data.counters.total_instituciones} />
           <AnimatedCounter icon={TrendingUp} color={COLORS.warning} label="Programas Activos" value={data.counters.total_programas} />

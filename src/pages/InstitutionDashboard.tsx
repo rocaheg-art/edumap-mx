@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { getInstitucionById, updateInstitucion, getGalleryByInstitucion, addGalleryImage, deleteGalleryImage, searchInstitucionesSuggest } from '../api';
 import { Institucion, GaleriaImagen } from '../types';

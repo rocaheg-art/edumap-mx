@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, ChevronRight, Sparkles } from 'lucide-react';
 import AnimatedCanvas from './AnimatedCanvas';
 import MexicoMapVisual from './MexicoMapVisual';

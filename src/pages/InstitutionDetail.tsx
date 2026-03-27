@@ -12,7 +12,7 @@ import {
   postReview
 } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { EstadisticasEdad } from '../types';
 

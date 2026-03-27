@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ClipboardCheck, Sparkles, ChevronRight, ChevronLeft, GraduationCap, Target, Brain, Lightbulb } from 'lucide-react';
 
 const VocationalTest: React.FC = () => {

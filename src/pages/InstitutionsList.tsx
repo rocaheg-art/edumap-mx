@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Search, Filter, Building2, ChevronDown, ChevronUp, Settings2, LayoutGrid, LayoutList, Map as MapIcon, Hash } from 'lucide-react';
 import { Institucion, Municipio } from '../types';
 import { getInstituciones, getFilters } from '../api';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import InstitutionCard from '../components/InstitutionCard';
 import MapComponent from '../components/MapComponent';
 import { Link, useSearchParams } from 'react-router-dom';

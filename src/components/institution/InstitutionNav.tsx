@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface InstitutionNavProps {
   id: string;

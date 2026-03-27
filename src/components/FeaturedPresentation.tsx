@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Star, MapPin, BookOpen, GraduationCap } from 'lucide-react';
 import { Institucion, Oferta } from '../types';
 

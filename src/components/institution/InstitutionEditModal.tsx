@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Save, Image as ImageIcon, Globe, Phone, FileText, Hash } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Institucion } from '../../types';
 import { updateInstitucion } from '../../api';
 

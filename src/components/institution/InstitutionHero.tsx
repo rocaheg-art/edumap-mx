@@ -1,6 +1,6 @@
 import React from 'react';
 import { Globe, Phone, Award, Users, MapPin, GraduationCap, Star, TrendingUp } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Institucion } from '../../types';
 
 interface InstitutionHeroProps {

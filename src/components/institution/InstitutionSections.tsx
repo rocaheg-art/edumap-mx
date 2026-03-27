@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Info, MapPin, GraduationCap, ChevronRight, MessageSquare, Star, Calendar, Users, Award, TrendingUp, Search, AlertTriangle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Institucion, Escuela, Oferta, GaleriaImagen, Review, Convocatoria, EstadisticasEdad } from '../../types';
 import MapComponent from '../MapComponent';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
