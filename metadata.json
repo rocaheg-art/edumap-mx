@@ -1,0 +1,7 @@
+{
+  "name": "EduMap MX",
+  "description": "Interactive university finder with vocational testing and comparisons.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
