@@ -176,16 +176,16 @@ const MapLegend = ({ type }: { type: MapType }) => {
   const config = configs[type];
 
   return (
-    <div className="absolute bottom-24 left-8 z-[1000] p-6 bg-white/95 backdrop-blur-xl rounded-[32px] shadow-2xl border border-white/50 w-64">
-      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-        <Info size={12} className="text-violet-500" /> Referencia Visual
+    <div className="absolute bottom-20 left-4 md:bottom-24 md:left-8 z-[1000] p-4 md:p-6 bg-white/95 backdrop-blur-xl rounded-2xl md:rounded-[32px] shadow-2xl border border-white/50 w-48 md:w-64">
+      <div className="text-[8px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 md:mb-4 flex items-center gap-2">
+        <Info size={10} className="text-violet-500" /> Referencia
       </div>
-      <div className="text-xs font-bold text-gray-900 mb-4 tracking-tight">{config.title}</div>
-      <div className="space-y-3">
+      <div className="text-[10px] md:text-xs font-bold text-gray-900 mb-2 md:mb-4 tracking-tight">{config.title}</div>
+      <div className="space-y-2 md:space-y-3">
         {config.items.map((item, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
-            <div className="text-[11px] font-medium text-gray-600">{item.label}</div>
+          <div key={i} className="flex items-center gap-2 md:gap-3">
+            <div className="w-2 md:w-3 h-2 md:h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
+            <div className="text-[9px] md:text-[11px] font-medium text-gray-600">{item.label}</div>
           </div>
         ))}
       </div>
@@ -219,8 +219,8 @@ const MapModule: React.FC<MapModuleProps> = ({ data }) => {
     <div className="relative w-full h-[850px] bg-gray-50 rounded-[64px] overflow-hidden border border-gray-100 shadow-[0_32px_128px_-32px_rgba(0,0,0,0.1)]">
       
       {/* Top Toolbar */}
-      <div className="absolute top-8 left-8 right-8 z-[1000] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex p-2 bg-white/90 backdrop-blur-2xl rounded-[32px] shadow-2xl border border-white/50 overflow-x-auto max-w-full no-scrollbar">
+      <div className="absolute top-4 left-4 right-4 md:top-8 md:left-8 md:right-8 z-[1000] flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
+        <div className="flex p-1.5 md:p-2 bg-white/90 backdrop-blur-2xl rounded-2xl md:rounded-[32px] shadow-2xl border border-white/50 overflow-x-auto max-w-full no-scrollbar gap-1">
           {mapOptions.map(opt => (
             <button
               key={opt.id}
@@ -228,19 +228,19 @@ const MapModule: React.FC<MapModuleProps> = ({ data }) => {
                   setActiveMap(opt.id as MapType);
                   setSelectedEntity(null);
               }}
-              className={`flex items-center gap-3 px-6 py-4 rounded-[24px] text-[11px] font-black tracking-widest transition-all whitespace-nowrap ${
+              className={`flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-4 rounded-xl md:rounded-[24px] text-[9px] md:text-[11px] font-black tracking-widest transition-all whitespace-nowrap ${
                 activeMap === opt.id 
-                ? 'bg-gray-900 text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)]' 
+                ? 'bg-gray-900 text-white shadow-lg' 
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
-              <opt.icon size={16} style={{ color: activeMap === opt.id ? '#fff' : opt.color }} />
+              <opt.icon size={window.innerWidth < 768 ? 12 : 16} style={{ color: activeMap === opt.id ? '#fff' : opt.color }} />
               {opt.label.toUpperCase()}
             </button>
           ))}
         </div>
 
-        <div className="flex gap-4">
+        <div className="hidden md:flex gap-4">
             <button 
               onClick={handleShare}
               className="p-5 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/50 text-gray-600 hover:scale-105 transition-all active:scale-95 group"
@@ -251,18 +251,18 @@ const MapModule: React.FC<MapModuleProps> = ({ data }) => {
       </div>
 
       {/* Layer Description Overlay */}
-      <div className="absolute top-36 left-8 z-[1000] max-w-xs">
+      <div className="absolute top-24 left-4 md:top-36 md:left-8 z-[1000] max-w-[200px] md:max-w-xs pointer-events-none">
           <motion.div 
             key={activeMap}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="p-6 bg-white/80 backdrop-blur-xl rounded-[32px] border border-white/50 shadow-xl"
+            className="p-4 md:p-6 bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-[32px] border border-white/50 shadow-xl"
           >
-              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Capa Activa</div>
-              <div className="text-lg font-black text-gray-900 leading-tight">
+              <div className="text-[8px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Capa Activa</div>
+              <div className="text-sm md:text-lg font-black text-gray-900 leading-tight">
                   {mapOptions.find(o => o.id === activeMap)?.label}
               </div>
-              <p className="text-[11px] text-gray-500 mt-2 font-medium leading-relaxed">
+              <p className="hidden md:block text-[11px] text-gray-500 mt-2 font-medium leading-relaxed">
                   {mapOptions.find(o => o.id === activeMap)?.desc}
               </p>
           </motion.div>
@@ -423,18 +423,26 @@ const MapModule: React.FC<MapModuleProps> = ({ data }) => {
       <AnimatePresence>
         {selectedEntity && (
             <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              className="absolute top-0 right-0 h-full w-[450px] bg-white/95 backdrop-blur-3xl z-[1500] shadow-[-40px_0_80px_-20px_rgba(0,0,0,0.1)] p-12 flex flex-col border-l border-white/50"
+              initial={{ x: window.innerWidth < 768 ? 0 : '100%', y: window.innerWidth < 768 ? '100%' : 0 }}
+              animate={{ x: 0, y: 0 }}
+              exit={{ x: window.innerWidth < 768 ? 0 : '100%', y: window.innerWidth < 768 ? '100%' : 0 }}
+              className={`
+                absolute z-[1500] bg-white/95 backdrop-blur-3xl shadow-[-40px_0_80px_-20px_rgba(0,0,0,0.1)] flex flex-col border-white/50
+                ${window.innerWidth < 768 
+                  ? 'bottom-0 left-0 right-0 h-[70vh] rounded-t-[40px] border-t p-8 p-t-4' 
+                  : 'top-0 right-0 h-full w-[450px] border-l p-12'}
+              `}
             >
-                <div className="flex justify-between items-center mb-12">
-                    <div className="p-4 bg-gray-900 text-white rounded-[24px] shadow-lg"><Maximize2 size={24} /></div>
+                {window.innerWidth < 768 && (
+                  <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 shrink-0" />
+                )}
+                <div className="flex justify-between items-center mb-8 md:mb-12">
+                    <div className="p-3 md:p-4 bg-gray-900 text-white rounded-2xl md:rounded-[24px] shadow-lg"><Maximize2 size={window.innerWidth < 768 ? 18 : 24} /></div>
                     <button 
                         onClick={() => setSelectedEntity(null)} 
-                        className="p-4 bg-gray-50 hover:bg-gray-100 rounded-[24px] transition-colors"
+                        className="p-3 md:p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl md:rounded-[24px] transition-colors"
                     >
-                        <X size={24} className="text-gray-400" />
+                        <X size={window.innerWidth < 768 ? 18 : 24} className="text-gray-400" />
                     </button>
                 </div>
 
@@ -520,10 +528,10 @@ const MapModule: React.FC<MapModuleProps> = ({ data }) => {
       </AnimatePresence>
 
       {/* Interaction Help */}
-      <div className="absolute bottom-8 right-8 z-[1000] flex gap-4">
-          <div className="p-4 bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 flex items-center gap-3">
-              <MousePointer2 size={16} className="text-violet-500 animate-pulse" />
-              <div className="text-[10px] font-black text-gray-900 tracking-widest uppercase">Interactúa con los puntos</div>
+      <div className="absolute bottom-6 md:bottom-8 right-4 md:right-8 z-[1000] flex gap-4">
+          <div className="p-2.5 md:p-4 bg-white/90 backdrop-blur-xl rounded-xl md:rounded-2xl shadow-xl border border-white/50 flex items-center gap-2 md:gap-3">
+              <MousePointer2 size={12} className="text-violet-500 animate-pulse md:size-16" />
+              <div className="text-[8px] md:text-[10px] font-black text-gray-900 tracking-widest uppercase">Toca para detalles</div>
           </div>
       </div>
     </div>

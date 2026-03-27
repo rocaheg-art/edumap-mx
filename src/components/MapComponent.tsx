@@ -280,7 +280,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       {/* Map Controls/Overlay */}
       {!simpleMode && (
         <>
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] lg:hidden flex flex-col items-center gap-1.5 transition-all duration-500">
+          <div className="absolute top-4 left-4 z-[1000] lg:hidden flex flex-col items-start gap-1.5 transition-all duration-500">
             <div className="bg-white/90 backdrop-blur-md p-1.5 lg:p-2 rounded-xl lg:rounded-2xl shadow-xl border border-white/50 flex items-center gap-2">
               <div className="p-1.5 lg:p-2 bg-indigo-600 text-white rounded-lg">
                 <Search size={isMobile ? 14 : 18} />
