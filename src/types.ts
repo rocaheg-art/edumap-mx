@@ -54,6 +54,9 @@ export interface Escuela {
   id_escuela: number;
   id_institucion: number;
   id_municipio?: number;
+  id_entidad?: number;
+  id_sostenimiento?: number;
+  niveles_ids?: string;
   nombre: string;
   nombre_anuies?: string;
   direccion?: string;
@@ -65,6 +68,8 @@ export interface Escuela {
   institucion_nombre?: string;
   municipio_nombre?: string;
   sostenimiento?: string;
+  sostenimiento_nombre?: string;
+  subsistema?: string;
   color_hex?: string;
   promedio_calificacion?: number;
 }

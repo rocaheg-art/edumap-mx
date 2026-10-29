@@ -720,9 +720,11 @@ async function startServer() {
       const { institucion, carrera, estado, municipio, nivel, sostenimiento, q } = req.query;
       
       let sql = `
-          SELECT e.id_escuela, e.id_institucion, e.nombre, e.latitud, e.longitud,
-                 i.nombre as inst_nombre, i.siglas, i.logo_url, i.color_hex, s.nombre as sostenimiento_nombre, i.banner_url,
-                 mun.nombre as municipio_nombre
+          SELECT e.id_escuela, e.id_institucion, e.id_municipio, mun.id_entidad,
+                 e.nombre, e.latitud, e.longitud,
+                 i.id_sostenimiento, i.nombre as inst_nombre, i.siglas, i.logo_url, i.color_hex, s.nombre as sostenimiento_nombre, i.banner_url,
+                 mun.nombre as municipio_nombre,
+                 GROUP_CONCAT(DISTINCT o.id_nivel) as niveles_ids
           FROM escuelas e
           JOIN instituciones i ON e.id_institucion = i.id_institucion
           LEFT JOIN sostenimientos s ON i.id_sostenimiento = s.id_sostenimiento
@@ -1174,7 +1176,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   });
 }
 
